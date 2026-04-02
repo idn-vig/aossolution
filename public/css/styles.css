@@ -31,6 +31,7 @@ body {
     radial-gradient(circle at top center, rgba(218, 54, 51, 0.08), transparent 18%),
     linear-gradient(180deg, #0d1117 0%, #0d1117 100%);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .home-body {
@@ -1180,7 +1181,7 @@ textarea {
 }
 
 .table-wrap {
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .admin-table {
@@ -1827,4 +1828,277 @@ body,
     grid-template-columns: 1fr 1fr;
   }
 
+}
+
+@media (max-width: 640px) {
+  .container,
+  .detail-light-container {
+    width: min(100%, calc(100% - 24px));
+  }
+
+  .portal-topline {
+    font-size: 12px;
+  }
+
+  .portal-topline-inner {
+    padding: 8px 0;
+  }
+
+  .portal-socialbar-inner,
+  .portal-header-grid,
+  .footer-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .social-links {
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .portal-header {
+    padding: 12px 0;
+  }
+
+  .portal-brand {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .portal-brand-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .brand-title {
+    font-size: 22px;
+  }
+
+  .brand-copy {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .portal-search {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .portal-search input,
+  .portal-search select,
+  .portal-search button {
+    border-radius: 0;
+    width: 100%;
+  }
+
+  .portal-search input {
+    border-radius: 12px 12px 0 0;
+  }
+
+  .portal-search button {
+    border-radius: 0 0 12px 12px;
+  }
+
+  .portal-cart {
+    width: 100%;
+    justify-content: center;
+    text-align: left;
+  }
+
+  .portal-menu-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .portal-menu {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    min-width: max-content;
+    padding: 0 0 4px;
+  }
+
+  .portal-menu a {
+    white-space: nowrap;
+    padding: 12px 14px;
+  }
+
+  .portal-ticker-section {
+    padding: 8px 0 12px;
+  }
+
+  .portal-ticker-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .ticker-label {
+    padding-left: 0;
+    font-size: 15px;
+  }
+
+  .ticker-marquee {
+    padding: 10px 12px;
+  }
+
+  .portal-red-search {
+    padding: 8px 0;
+  }
+
+  .portal-red-search-form {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .portal-red-search-form input,
+  .portal-red-search-form button {
+    width: 100%;
+  }
+
+  .portal-red-search-form input {
+    border-radius: 12px 12px 0 0;
+    min-height: 48px;
+    height: 48px;
+    line-height: 48px;
+  }
+
+  .portal-red-search-form button {
+    border-left: 1px solid #30363d;
+    border-top: 0;
+    border-radius: 0 0 12px 12px;
+    min-height: 46px;
+    height: 46px;
+  }
+
+  .portal-section-head h2,
+  .section-head h2 {
+    font-size: 32px;
+  }
+
+  .solution-list {
+    gap: 14px;
+  }
+
+  .solution-item {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .solution-item-icon {
+    margin: 0 auto;
+  }
+
+  .solution-item-body {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .solution-item-top h3 {
+    font-size: 18px;
+  }
+
+  .solution-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .solution-item-side {
+    justify-items: stretch;
+  }
+
+  .solution-download-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .files-grid,
+  .stat-grid,
+  .section-grid,
+  .hero-grid,
+  .detail-grid,
+  .form-grid,
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel,
+  .login-card,
+  .detail-light-card {
+    padding: 18px 16px;
+  }
+
+  .detail-back-link {
+    gap: 10px;
+  }
+
+  .detail-back-icon {
+    width: 46px;
+    height: 42px;
+    font-size: 28px;
+  }
+
+  .detail-light-head {
+    text-align: left;
+  }
+
+  .detail-light-head h1 {
+    font-size: 28px;
+    line-height: 1.22;
+  }
+
+  .detail-rating-row {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .detail-light-head p {
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .detail-simple-table {
+    margin-top: 24px;
+  }
+
+  .detail-simple-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 12px 0;
+  }
+
+  .detail-simple-label {
+    text-align: left;
+    padding-right: 0;
+    font-size: 16px;
+  }
+
+  .detail-simple-value {
+    font-size: 16px;
+    word-break: break-word;
+  }
+
+  .detail-download-button {
+    min-height: 52px;
+    font-size: 17px;
+  }
+
+  .admin-head h1,
+  .login-card h1 {
+    font-size: 28px;
+  }
+
+  .quick-link-row {
+    grid-template-columns: 1fr;
+  }
+
+  .auto-fill-button {
+    width: 100%;
+    min-width: 0;
+  }
 }
