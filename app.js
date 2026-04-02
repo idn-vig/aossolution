@@ -361,6 +361,16 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.send("User-agent: *\nDisallow: /admin\n");
+});
+
+app.use("/admin", (req, res, next) => {
+  res.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  next();
+});
+
 app.get("/", (req, res) => {
   const store = readStore();
   const files = [...store.files].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
