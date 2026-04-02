@@ -3,11 +3,13 @@ const session = require("express-session");
 const path = require("path");
 const crypto = require("crypto");
 const { readStore, writeStore, DB_FILE } = require("./db");
+const remoteContactModels = require("./remote-models");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DEFAULT_PRICE = "$10";
 const METADATA_TIMEOUT_MS = 8000;
+const REMOTE_CONTACT_SLUG = "remote-contact";
 const ADMIN_BASE = "/aos-panel-login-2026";
 const ADMIN_DASHBOARD = `${ADMIN_BASE}/dashboard`;
 const ADMIN_NEW_FILE = `${ADMIN_BASE}/files/new`;
@@ -15,6 +17,14 @@ const ADMIN_FILES = `${ADMIN_BASE}/files`;
 const ADMIN_SETTINGS = `${ADMIN_BASE}/settings`;
 const ADMIN_LOGOUT = `${ADMIN_BASE}/logout`;
 const ADMIN_LINK_PREVIEW = `${ADMIN_BASE}/link-preview`;
+
+function getFileCategories(store) {
+  return store.categories.filter((category) => category.slug !== REMOTE_CONTACT_SLUG);
+}
+
+function getPublicFiles(store) {
+  return store.files.filter((file) => file.categorySlug !== REMOTE_CONTACT_SLUG);
+}
 
 function slugify(value) {
   return String(value || "")
@@ -42,9 +52,49 @@ function ensureUniqueSlug(baseSlug, items, currentId) {
 }
 
 function getCategoryWithCount(store) {
-  return store.categories.map((category) => ({
+  return getFileCategories(store).map((category) => ({
     ...category,
     totalFiles: store.files.filter((file) => file.categorySlug === category.slug).length,
+  }));
+}
+
+function buildRemoteModelGroups() {
+  const groups = new Map();
+
+  remoteContactModels.forEach((entry) => {
+    const text = String(entry || "").trim();
+
+    if (!text) {
+      return;
+    }
+
+    const openIndex = text.lastIndexOf("(");
+    const closeIndex = text.lastIndexOf(")");
+    const rawModel = openIndex > 0 ? text.slice(0, openIndex).trim() : text;
+    const rawChipset =
+      openIndex > 0
+        ? text
+            .slice(openIndex + 1, closeIndex > openIndex ? closeIndex : undefined)
+            .trim()
+        : "QC";
+    const chipset = rawChipset.replace(/_/g, " ").replace(/\s+/g, " ").trim().toUpperCase();
+
+    if (!groups.has(chipset)) {
+      groups.set(chipset, []);
+    }
+
+    groups.get(chipset).push({
+      label: rawModel,
+      chipset,
+      raw: text,
+    });
+  });
+
+  return Array.from(groups.entries()).map(([chipset, models]) => ({
+    chipset,
+    count: models.length,
+    models,
+    searchText: `${chipset} ${models.map((item) => item.label).join(" ")}`.toLowerCase(),
   }));
 }
 
@@ -103,7 +153,6 @@ function guessBrand(value) {
 function guessCategorySlug(value, categories, currentSlug) {
   const text = String(value || "").toLowerCase();
   const rules = [
-    { slug: "remote-contact", keywords: ["remote", "support", "contact", "anydesk", "teamviewer"] },
     { slug: "tools", keywords: ["tool", "driver", "unlock", "dongle", "setup", "usb"] },
     { slug: "spd", keywords: ["spd", "spreadtrum", "pac"] },
     { slug: "qualcomm", keywords: ["qualcomm", "qcom", "edl", "firehose", "loader", "xml", "test point", "9008"] },
@@ -387,7 +436,7 @@ app.use(ADMIN_BASE, (req, res, next) => {
 
 app.get("/", (req, res) => {
   const store = readStore();
-  const files = [...store.files].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const files = [...getPublicFiles(store)].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
   res.render("index", {
     site: store.site,
@@ -400,12 +449,27 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/remote-contact", (req, res) => {
+  const store = readStore();
+
+  res.render("remote-contact", {
+    site: store.site,
+    siteCategories: store.categories,
+    remoteGroups: buildRemoteModelGroups(),
+    totalModels: remoteContactModels.length,
+  });
+});
+
 app.get("/files", (req, res) => {
   const store = readStore();
   const search = (req.query.q || "").trim().toLowerCase();
   const category = req.query.category || "";
 
-  let files = [...store.files].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  if (category === REMOTE_CONTACT_SLUG) {
+    return res.redirect("/remote-contact");
+  }
+
+  let files = [...getPublicFiles(store)].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
   if (category) {
     files = files.filter((file) => file.categorySlug === category);
@@ -420,7 +484,7 @@ app.get("/files", (req, res) => {
     );
   }
 
-  const activeCategory = store.categories.find((item) => item.slug === category);
+  const activeCategory = getFileCategories(store).find((item) => item.slug === category);
 
   res.render("files", {
     site: store.site,
@@ -433,6 +497,10 @@ app.get("/files", (req, res) => {
 });
 
 app.get("/category/:slug", (req, res) => {
+  if (req.params.slug === REMOTE_CONTACT_SLUG) {
+    return res.redirect("/remote-contact");
+  }
+
   res.redirect(`/files?category=${encodeURIComponent(req.params.slug)}`);
 });
 
@@ -442,6 +510,10 @@ app.get("/file/:slug", (req, res) => {
 
   if (!file) {
     return res.status(404).render("404", { site: store.site, siteCategories: store.categories });
+  }
+
+  if (file.categorySlug === REMOTE_CONTACT_SLUG) {
+    return res.redirect("/remote-contact");
   }
 
   const relatedFiles = store.files
@@ -500,7 +572,7 @@ app.get(ADMIN_DASHBOARD, requireAdmin, (req, res) => {
     categories: getCategoryWithCount(store),
     stats: {
       totalFiles: store.files.length,
-      totalCategories: store.categories.length,
+      totalCategories: getFileCategories(store).length,
       featuredFiles: store.files.filter((file) => file.featured).length,
       hotFiles: store.files.filter((file) => file.hot).length,
     },
@@ -512,7 +584,7 @@ app.get(ADMIN_NEW_FILE, requireAdmin, (req, res) => {
 
   res.render("admin/form", {
     site: store.site,
-    categories: store.categories,
+    categories: getFileCategories(store),
     file: null,
     formAction: ADMIN_FILES,
     pageTitle: "Add New File",
@@ -614,7 +686,7 @@ app.get(`${ADMIN_FILES}/:id/edit`, requireAdmin, (req, res) => {
 
   res.render("admin/form", {
     site: store.site,
-    categories: store.categories,
+    categories: getFileCategories(store),
     file,
     formAction: `${ADMIN_FILES}/${file.id}/update`,
     pageTitle: `Edit ${file.title}`,

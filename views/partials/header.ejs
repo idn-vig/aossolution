@@ -9,6 +9,7 @@
 </head>
 <body class="<%= title === 'Home' ? 'home-body' : '' %>">
   <% const navCategories = typeof siteCategories !== "undefined" ? siteCategories : []; %>
+  <% const downloadCategories = navCategories.filter((category) => category.slug !== "remote-contact"); %>
   <div class="portal-topline">
     <div class="container portal-topline-inner">
       <marquee behavior="scroll" direction="left" scrollamount="5" onmouseover="this.stop();" onmouseout="this.start();">
@@ -58,7 +59,7 @@
         <input type="text" name="q" placeholder="Search for firmware, FRP, tool, schematic..." />
         <select name="category">
           <option value="">Downloads</option>
-          <% navCategories.forEach((category) => { %>
+          <% downloadCategories.forEach((category) => { %>
             <option value="<%= category.slug %>"><%= category.name %></option>
           <% }) %>
         </select>
@@ -81,7 +82,8 @@
         <span class="menu-link-inner"><%- include("menu-icon", { icon: "home" }) %><span>Home</span></span>
       </a>
       <% navCategories.forEach((category) => { %>
-        <a href="/files?category=<%= category.slug %>">
+        <% const targetHref = category.slug === "remote-contact" ? "/remote-contact" : `/files?category=${category.slug}`; %>
+        <a class="<%= currentPath === '/remote-contact' && category.slug === 'remote-contact' ? 'active' : '' %>" href="<%= targetHref %>">
           <span class="menu-link-inner"><%- include("menu-icon", { icon: category.icon }) %><span><%= category.name %></span></span>
         </a>
       <% }) %>

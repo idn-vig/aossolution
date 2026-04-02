@@ -1,0 +1,122 @@
+<%- include("partials/header", { title: "Remote Contact", site, currentPath, flash, siteCategories }) %>
+
+<section class="section remote-hero-shell">
+  <div class="container">
+    <div class="remote-hero">
+      <div class="remote-hero-copy">
+        <div class="remote-eyebrow">Remote Contact</div>
+        <h1>Huawei ID Remove and Qualcomm Instant Remote Access</h1>
+        <p>
+          Fast remote support for Huawei and Honor Qualcomm devices. Contact the admin directly for Huawei ID remove,
+          Qualcomm instant service, and supported remote jobs listed below.
+        </p>
+        <div class="remote-badge-row">
+          <span class="remote-badge remote-badge-red">Huawei ID Remove</span>
+          <span class="remote-badge">Qualcomm Instant</span>
+          <span class="remote-badge">Remote Access</span>
+        </div>
+        <div class="remote-cta-row">
+          <a class="btn btn-primary" href="<%= site.whatsapp %>" target="_blank" rel="noreferrer">WhatsApp Admin</a>
+          <a class="btn btn-secondary" href="<%= site.telegram %>" target="_blank" rel="noreferrer">Telegram</a>
+          <a class="btn btn-secondary" href="<%= site.facebook %>" target="_blank" rel="noreferrer">Facebook</a>
+        </div>
+      </div>
+
+      <div class="remote-side-stack">
+        <div class="remote-side-card remote-side-card-highlight">
+          <span class="remote-side-label">Qualcomm ID Instan</span>
+          <strong>Direct Admin Access</strong>
+          <p>One-tap contact for supported Qualcomm devices and Huawei / Honor remote service requests.</p>
+        </div>
+        <div class="remote-side-card">
+          <span class="remote-side-label">Main Archive</span>
+          <strong>aosunlock.my.id</strong>
+          <p>Use the main archive for file solutions, then contact admin here when you need remote action.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="remote-feature-grid">
+      <article class="remote-feature-card">
+        <h2>Huawei ID Remove</h2>
+        <p>Dedicated remote access page for Huawei and Honor Qualcomm-based models that need Huawei ID remove service.</p>
+      </article>
+      <article class="remote-feature-card">
+        <h2>Qualcomm ID Instant</h2>
+        <p>Instant contact flow for Qualcomm jobs. Open WhatsApp or Telegram, send the model, and continue the remote session.</p>
+      </article>
+      <article class="remote-feature-card">
+        <h2>Clean Support Flow</h2>
+        <p>No file list here. This page is only for remote support, model checking, and direct admin communication.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head remote-section-head">
+      <h2>Supported Qualcomm Models</h2>
+      <p>Search your model or chipset first, then contact the admin for the matching remote service.</p>
+    </div>
+
+    <div class="remote-filter-bar">
+      <input type="text" placeholder="Search model or chipset..." data-remote-filter />
+      <div class="remote-filter-meta"><strong><%= totalModels %></strong> models listed</div>
+    </div>
+
+    <div class="remote-chip-grid">
+      <% remoteGroups.forEach((group) => { %>
+        <article class="remote-chip-card" data-remote-group data-search="<%= group.searchText %>">
+          <div class="remote-chip-head">
+            <div>
+              <span class="remote-chip-label">Chipset</span>
+              <h3><%= group.chipset %></h3>
+            </div>
+            <span class="remote-chip-count"><%= group.count %> models</span>
+          </div>
+          <div class="remote-model-list">
+            <% group.models.forEach((model) => { %>
+              <span class="remote-model-pill"><%= model.label %></span>
+            <% }) %>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+
+    <div class="empty remote-empty" hidden data-remote-empty>No matching model found. Contact the admin directly for manual checking.</div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const input = document.querySelector("[data-remote-filter]");
+    if (!input) return;
+
+    const cards = Array.from(document.querySelectorAll("[data-remote-group]"));
+    const empty = document.querySelector("[data-remote-empty]");
+
+    const updateFilter = () => {
+      const keyword = input.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const match = !keyword || card.dataset.search.includes(keyword);
+        card.hidden = !match;
+        if (match) visibleCount += 1;
+      });
+
+      if (empty) {
+        empty.hidden = visibleCount !== 0;
+      }
+    };
+
+    input.addEventListener("input", updateFilter);
+  })();
+</script>
+
+<%- include("partials/footer", { site }) %>
