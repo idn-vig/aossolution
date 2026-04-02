@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title ? `${title} | Admin ${site.name}` : `Admin ${site.name}` %></title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="navbar-wrap">
+    <div class="container navbar">
+      <a href="/admin" class="brand">
+        <div class="brand-title">Admin <span>Dashboard</span></div>
+        <div class="brand-copy"><%= site.name %></div>
+      </a>
+      <nav class="admin-links">
+        <% if (adminUser) { %>
+          <a class="<%= currentPath === '/admin' ? 'active' : '' %>" href="/admin">Dashboard</a>
+          <a class="<%= currentPath === '/admin/files/new' ? 'active' : '' %>" href="/admin/files/new">Add File</a>
+          <a class="<%= currentPath === '/admin/settings' ? 'active' : '' %>" href="/admin/settings">Settings</a>
+          <a href="/admin/logout">Logout</a>
+        <% } else { %>
+          <a class="<%= currentPath === '/admin/login' ? 'active' : '' %>" href="/admin/login">Login</a>
+        <% } %>
+      </nav>
+      <div class="inline-actions">
+        <a class="btn btn-ghost" href="/">View Site</a>
+      </div>
+    </div>
+  </div>
+  <main>
+    <div class="container spacer-top">
+      <% if (flash) { %>
+        <div class="flash <%= flash.type %>"><%= flash.message %></div>
+      <% } %>
+    </div>

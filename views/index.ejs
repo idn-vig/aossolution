@@ -1,0 +1,131 @@
+<%- include("partials/header", { title: "Home", site, currentPath, flash, siteCategories }) %>
+
+<section class="portal-ticker-section">
+  <div class="container portal-ticker-grid">
+    <div class="ticker-label">Recent Files</div>
+    <div class="ticker-list">
+      <% if (recentFiles.length) { %>
+        <div class="ticker-marquee">
+          <marquee behavior="scroll" direction="left" scrollamount="6" onmouseover="this.stop();" onmouseout="this.start();">
+            <% recentFiles.forEach((file, index) => { %>
+              <a class="ticker-link" href="/file/<%= file.slug %>">
+                <strong><%= file.title %></strong>
+                <span>[ <%= new Date(file.updatedAt).toLocaleDateString("id-ID") %> ]</span>
+              </a>
+              <% if (index !== recentFiles.length - 1) { %>
+                <span class="ticker-separator">|</span>
+              <% } %>
+            <% }) %>
+          </marquee>
+        </div>
+      <% } else { %>
+        <div class="ticker-marquee">No files published yet.</div>
+      <% } %>
+    </div>
+    <div class="ticker-label">Top Files</div>
+    <div class="ticker-list">
+      <% if (popularFiles.length) { %>
+        <div class="ticker-marquee">
+          <marquee behavior="scroll" direction="left" scrollamount="6" onmouseover="this.stop();" onmouseout="this.start();">
+            <% popularFiles.forEach((file, index) => { %>
+              <a class="ticker-link" href="/file/<%= file.slug %>">
+                <strong><%= file.title %></strong>
+                <span>[ <%= file.downloadCount %> Downloads ]</span>
+              </a>
+              <% if (index !== popularFiles.length - 1) { %>
+                <span class="ticker-separator">|</span>
+              <% } %>
+            <% }) %>
+          </marquee>
+        </div>
+      <% } else { %>
+        <div class="ticker-marquee">No download data available yet.</div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<section class="portal-red-search">
+  <div class="container">
+    <form action="/files" method="get" class="portal-red-search-form">
+      <input type="text" name="q" placeholder="Search Keyword" />
+      <button type="submit">Search</button>
+    </form>
+  </div>
+</section>
+
+<section class="portal-categories">
+  <div class="container">
+    <div class="section-head portal-section-head">
+      <h2>Latest Downloads</h2>
+      <p>Recently added firmware, tools, and repair files appear here automatically.</p>
+    </div>
+    <% if (!recentFiles.length) { %>
+      <div class="empty">No downloads have been published yet.</div>
+    <% } else { %>
+      <div class="solution-list">
+        <% recentFiles.forEach((file, index) => { %>
+          <article class="solution-item">
+            <div class="solution-item-icon">
+              <img class="solution-folder-svg" src="/folder-open-svgrepo-com.svg" alt="Folder icon" />
+              <span><%= (file.brand || "WS").slice(0, 2).toUpperCase() %></span>
+            </div>
+            <div class="solution-item-body">
+              <div class="solution-item-top">
+                <div class="solution-badges">
+                  <% if (index < 2) { %><span class="portal-new-badge">NEW</span><% } %>
+                  <% if (file.featured) { %><span class="badge badge-featured">Featured</span><% } %>
+                  <% if (file.hot) { %><span class="badge badge-hot">Hot</span><% } %>
+                </div>
+                <h3><a href="/file/<%= file.slug %>"><%= file.title %></a></h3>
+                <p><%= file.description %></p>
+                <div class="solution-meta">
+                  <span><strong>Brand:</strong> <%= file.brand || "-" %></span>
+                  <span><strong>Category:</strong> <%= file.categoryName %></span>
+                  <span><strong>Size:</strong> <%= file.fileSize || "-" %></span>
+                  <span><strong>Date:</strong> <%= new Date(file.updatedAt).toLocaleDateString("id-ID") %></span>
+                </div>
+              </div>
+              <div class="solution-item-side">
+                <a class="btn btn-primary solution-download-btn" href="/file/<%= file.slug %>">Open File</a>
+                <div class="portal-card-meta"><%= file.price || "Free" %></div>
+              </div>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <% if (featuredFiles.length) { %>
+      <div class="section-head portal-section-head">
+        <h2>Featured Downloads</h2>
+        <p>Highlighted files with strong visibility for fast access.</p>
+      </div>
+      <div class="files-grid">
+        <% featuredFiles.forEach((file) => { %>
+          <article class="file-card portal-file-card">
+            <div class="badge-row">
+              <% if (file.featured) { %><span class="badge badge-featured">FEATURED</span><% } %>
+              <% if (file.hot) { %><span class="badge badge-hot">HOT</span><% } %>
+            </div>
+            <h3><%= file.title %></h3>
+            <p><%= file.description %></p>
+            <div class="tag-row">
+              <span class="badge badge-tag"><%= file.brand %></span>
+              <span class="badge badge-tag"><%= file.downloadCount %> Downloads</span>
+            </div>
+            <div class="action-row spacer-top">
+              <a class="btn btn-primary" href="/file/<%= file.slug %>">Open File</a>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include("partials/footer", { site }) %>

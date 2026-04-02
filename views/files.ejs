@@ -1,0 +1,61 @@
+<%- include("partials/header", { title: "Files", site, currentPath, flash, siteCategories }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>All Files</h2>
+      <p><%= activeCategory ? `Showing ${activeCategory.name}.` : "Browse firmware, FRP packages, drivers, tools, and repair files." %></p>
+    </div>
+    <div class="panel">
+      <form class="form-grid" action="/files" method="get">
+        <div class="field">
+          <span>Search keyword</span>
+          <input type="text" name="q" value="<%= search %>" placeholder="Example: Xiaomi, FRP, SPD driver" />
+        </div>
+        <div class="field">
+          <span>Category</span>
+          <select name="category">
+            <option value="">All categories</option>
+            <% categories.forEach((category) => { %>
+              <option value="<%= category.slug %>" <%= activeCategory && activeCategory.slug === category.slug ? "selected" : "" %>><%= category.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="field full">
+          <button class="btn btn-primary" type="submit">Filter Files</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <% if (!files.length) { %>
+      <div class="empty">No files matched your current filter.</div>
+    <% } else { %>
+      <div class="files-grid">
+        <% files.forEach((file) => { %>
+          <article class="file-card">
+            <div class="badge-row">
+              <% if (file.featured) { %><span class="badge badge-featured">FEATURED</span><% } %>
+              <% if (file.hot) { %><span class="badge badge-hot">HOT</span><% } %>
+            </div>
+            <h3><%= file.title %></h3>
+            <p><%= file.description %></p>
+            <div class="tag-row">
+              <span class="badge badge-tag"><%= file.brand %></span>
+              <span class="badge badge-tag"><%= file.categoryName %></span>
+              <span class="badge badge-tag"><%= file.fileSize %></span>
+            </div>
+            <div class="action-row spacer-top">
+              <a class="btn btn-primary" href="/file/<%= file.slug %>">Open File</a>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include("partials/footer", { site }) %>

@@ -1,0 +1,32 @@
+  </main>
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <strong><%= site.name %></strong>
+        <div class="muted"><%= site.tagline %></div>
+        <div class="footer-socials">
+          <a class="social-icon-link" href="<%= site.whatsapp %>" target="_blank" rel="noreferrer" aria-label="WhatsApp" title="WhatsApp">
+            <%- include("social-icon", { icon: "whatsapp" }) %>
+          </a>
+          <a class="social-icon-link" href="<%= site.telegram %>" target="_blank" rel="noreferrer" aria-label="Telegram" title="Telegram">
+            <%- include("social-icon", { icon: "telegram" }) %>
+          </a>
+          <a class="social-icon-link" href="<%= site.facebook %>" target="_blank" rel="noreferrer" aria-label="Facebook" title="Facebook">
+            <%- include("social-icon", { icon: "facebook" }) %>
+          </a>
+          <a class="social-icon-link" href="<%= site.website %>" target="_blank" rel="noreferrer" aria-label="Main Website" title="aosunlock.my.id">
+            <%- include("social-icon", { icon: "website" }) %>
+          </a>
+        </div>
+      </div>
+      <div class="toolbar">
+        <a href="/">Home</a>
+        <a href="/files">Downloads</a>
+        <a href="<%= site.website %>" target="_blank" rel="noreferrer">Full File</a>
+        <a href="<%= site.whatsapp %>" target="_blank" rel="noreferrer">Contact</a>
+        <a class="footer-admin-link" href="<%= (typeof adminUser !== 'undefined' && adminUser) ? '/admin' : '/admin/login' %>" rel="nofollow"><%= (typeof adminUser !== 'undefined' && adminUser) ? 'Dashboard' : 'Admin Access' %></a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

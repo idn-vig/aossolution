@@ -1,0 +1,80 @@
+<%- include("header", { title: "Dashboard", site, currentPath, flash, adminUser }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="admin-head">
+      <h1>Admin Dashboard</h1>
+      <p class="muted">Manage your real files here, paste live download links, and publish updates instantly.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stats-card">
+        <span class="muted">Total Files</span>
+        <strong><%= stats.totalFiles %></strong>
+      </div>
+      <div class="stats-card">
+        <span class="muted">Categories</span>
+        <strong><%= stats.totalCategories %></strong>
+      </div>
+      <div class="stats-card">
+        <span class="muted">Featured</span>
+        <strong><%= stats.featuredFiles %></strong>
+      </div>
+      <div class="stats-card">
+        <span class="muted">Hot Files</span>
+        <strong><%= stats.hotFiles %></strong>
+      </div>
+    </div>
+
+    <div class="toolbar spacer-top">
+      <a class="btn btn-primary" href="/admin/files/new">Add New File</a>
+      <a class="btn btn-secondary" href="/admin/settings">Edit Settings</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Files List</h2>
+      <p>The newest files always stay at the top.</p>
+    </div>
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Link</th>
+            <th>Updated</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% files.forEach((file) => { %>
+            <tr>
+              <td>
+                <strong><%= file.title %></strong>
+                <div class="muted"><%= file.brand %> | <%= file.fileSize %></div>
+              </td>
+              <td><%= file.categoryName %></td>
+              <td><%= file.price || "Free" %></td>
+              <td><a href="<%= file.primaryLink %>" target="_blank" rel="noreferrer">Open Link</a></td>
+              <td><%= new Date(file.updatedAt).toLocaleDateString("en-GB") %></td>
+              <td>
+                <div class="inline-actions">
+                  <a class="btn btn-secondary" href="/admin/files/<%= file.id %>/edit">Edit</a>
+                  <form action="/admin/files/<%= file.id %>/delete" method="post" onsubmit="return confirm('Delete this file?');">
+                    <button class="btn btn-ghost" type="submit">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<%- include("footer") %>

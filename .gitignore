@@ -1,0 +1,4 @@
+node_modules/
+data/aos.sqlite
+data/aos.sqlite-shm
+data/aos.sqlite-wal

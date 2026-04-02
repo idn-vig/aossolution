@@ -1,0 +1,26 @@
+<%- include("header", { title: "Login", site, currentPath, flash, adminUser }) %>
+
+<section class="section">
+  <div class="container login-grid">
+    <div class="login-card">
+      <div class="eyebrow">Admin Only</div>
+      <h1>Sign in to manage real download files.</h1>
+      <p class="muted">Public visitors do not need a login. This panel is only for you to manage titles, prices, passwords, and real links.</p>
+      <form action="/admin/login" method="post" class="form-grid spacer-top">
+        <div class="field full">
+          <span>Username</span>
+          <input type="text" name="username" placeholder="Enter your admin username" required />
+        </div>
+        <div class="field full">
+          <span>Password</span>
+          <input type="password" name="password" placeholder="Enter your admin password" required />
+        </div>
+        <div class="field full">
+          <button class="btn btn-primary" type="submit">Open Dashboard</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include("footer") %>

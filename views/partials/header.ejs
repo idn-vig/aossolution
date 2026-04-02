@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title ? `${title} | ${site.name}` : site.name %></title>
+  <meta name="description" content="<%= site.tagline %>" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="<%= title === 'Home' ? 'home-body' : '' %>">
+  <% const navCategories = typeof siteCategories !== "undefined" ? siteCategories : []; %>
+  <div class="portal-topline">
+    <div class="container portal-topline-inner">
+      <marquee behavior="scroll" direction="left" scrollamount="5" onmouseover="this.stop();" onmouseout="this.start();">
+        <span>Daily firmware updates</span>
+        <span>Verified download links</span>
+        <span>Telegram support available</span>
+        <span>Flash tools and repair resources</span>
+        <span>Fast archive access</span>
+      </marquee>
+    </div>
+  </div>
+
+  <div class="portal-socialbar">
+    <div class="container portal-socialbar-inner">
+      <div class="social-links social-links-icons">
+        <a class="social-icon-link" href="<%= site.whatsapp %>" target="_blank" rel="noreferrer" aria-label="WhatsApp" title="WhatsApp">
+          <%- include("social-icon", { icon: "whatsapp" }) %>
+        </a>
+        <a class="social-icon-link" href="<%= site.telegram %>" target="_blank" rel="noreferrer" aria-label="Telegram" title="Telegram">
+          <%- include("social-icon", { icon: "telegram" }) %>
+        </a>
+        <a class="social-icon-link" href="<%= site.facebook %>" target="_blank" rel="noreferrer" aria-label="Facebook" title="Facebook">
+          <%- include("social-icon", { icon: "facebook" }) %>
+        </a>
+        <a class="social-icon-link" href="<%= site.website %>" target="_blank" rel="noreferrer" aria-label="Main Website" title="aosunlock.my.id">
+          <%- include("social-icon", { icon: "website" }) %>
+        </a>
+      </div>
+      <div class="social-links">
+        <a href="/files">Latest Files</a>
+        <a href="<%= site.website %>" target="_blank" rel="noreferrer">Full File</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="portal-header">
+    <div class="container portal-header-grid">
+      <a href="/" class="portal-brand">
+        <img class="portal-brand-image" src="<%= site.logo || '/huawei-solutions.svg' %>" alt="<%= site.name %> logo" />
+        <div>
+          <div class="brand-title">AOS<span>Solution</span></div>
+          <div class="brand-copy"><%= site.tagline %></div>
+        </div>
+      </a>
+
+      <form action="/files" method="get" class="portal-search">
+        <input type="text" name="q" placeholder="Search for firmware, FRP, tool, schematic..." />
+        <select name="category">
+          <option value="">Downloads</option>
+          <% navCategories.forEach((category) => { %>
+            <option value="<%= category.slug %>"><%= category.name %></option>
+          <% }) %>
+        </select>
+        <button class="btn btn-primary" type="submit">Search</button>
+      </form>
+
+      <div class="portal-cart">
+        <div class="portal-cart-icon">LIVE</div>
+        <div>
+          <strong>Verified Archive</strong>
+          <div class="muted">Huawei and Honor file solutions with fast access to full archives</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="portal-menu-wrap">
+    <div class="container portal-menu">
+      <a class="<%= currentPath === '/' ? 'active' : '' %>" href="/">
+        <span class="menu-link-inner"><%- include("menu-icon", { icon: "home" }) %><span>Home</span></span>
+      </a>
+      <% navCategories.forEach((category) => { %>
+        <a href="/files?category=<%= category.slug %>">
+          <span class="menu-link-inner"><%- include("menu-icon", { icon: category.icon }) %><span><%= category.name %></span></span>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+
+  <main>
+    <div class="container spacer-top">
+      <% if (flash) { %>
+        <div class="flash <%= flash.type %>"><%= flash.message %></div>
+      <% } %>
+    </div>

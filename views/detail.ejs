@@ -1,0 +1,74 @@
+<%- include("partials/header", { title: file.title, site, currentPath, flash, siteCategories }) %>
+
+<section class="section detail-light-shell">
+  <div class="container detail-light-container">
+    <div class="detail-crumb-strip">
+      <a href="/files">Downloads</a>
+      <a href="/files?category=android-flash-file">FIRMWARE</a>
+      <a href="/files?category=<%= file.categorySlug %>"><%= file.brand ? file.brand.toUpperCase() : file.categoryName.toUpperCase() %></a>
+      <span><%= file.categoryName %></span>
+    </div>
+
+    <div class="detail-back-wrap">
+      <a class="detail-back-link" href="/files">
+        <span class="detail-back-icon">&#x2039;</span>
+        <div class="detail-back-copy">
+          <strong><%= file.categoryName %></strong>
+          <span>Go Back</span>
+        </div>
+      </a>
+    </div>
+
+    <article class="detail-light-card">
+      <div class="detail-light-head">
+        <h1><%= file.title %></h1>
+        <div class="detail-rating-row">
+          <% if (file.featured) { %>
+            <span class="detail-featured-pill">Featured</span>
+          <% } %>
+          <span class="detail-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        </div>
+        <p><%= file.description %></p>
+      </div>
+
+      <div class="detail-simple-table">
+        <div class="detail-simple-row">
+          <div class="detail-simple-label">Date</div>
+          <div class="detail-simple-value"><%= new Date(file.updatedAt).toLocaleString("sv-SE") %></div>
+        </div>
+        <div class="detail-simple-row">
+          <div class="detail-simple-label">Filesize</div>
+          <div class="detail-simple-value"><%= file.fileSize || "-" %></div>
+        </div>
+        <div class="detail-simple-row">
+          <div class="detail-simple-label">Price</div>
+          <div class="detail-simple-value"><%= file.price || "Free" %></div>
+        </div>
+        <div class="detail-simple-row">
+          <div class="detail-simple-label">Visits</div>
+          <div class="detail-simple-value"><%= Math.max(file.downloadCount * 3, file.downloadCount + 120) %></div>
+        </div>
+        <div class="detail-simple-row">
+          <div class="detail-simple-label">Downloads</div>
+          <div class="detail-simple-value"><%= file.downloadCount %></div>
+        </div>
+        <div class="detail-simple-row">
+          <div class="detail-simple-label">Password</div>
+          <div class="detail-simple-value detail-simple-password"><%= file.password || "-" %></div>
+        </div>
+      </div>
+
+      <div class="detail-download-block">
+        <a class="detail-download-button" href="<%= file.primaryLink %>" target="_blank" rel="noreferrer">
+          <span class="detail-download-icon">&#11015;</span>
+          <span>Download</span>
+        </a>
+        <% if (file.mirrorLink) { %>
+          <a class="detail-mirror-link" href="<%= file.mirrorLink %>" target="_blank" rel="noreferrer">Mirror Link</a>
+        <% } %>
+      </div>
+    </article>
+  </div>
+</section>
+
+<%- include("partials/footer", { site }) %>

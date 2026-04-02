@@ -1,0 +1,181 @@
+<%- include("header", { title: pageTitle, site, currentPath, flash, adminUser }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="admin-head">
+      <h1><%= pageTitle %></h1>
+      <p class="muted">Quick mode: paste the file title and the real link first. Price starts at $10, and the system will try to detect the file size automatically.</p>
+    </div>
+
+    <div class="panel">
+      <form action="<%= formAction %>" method="post" class="form-grid auto-fill-form" data-auto-form>
+        <div class="field full">
+          <span>File title</span>
+          <input type="text" name="title" value="<%= file ? file.title : '' %>" placeholder="Example: Honor X9 Kirin Firmware Pack" required />
+        </div>
+
+        <div class="field full">
+          <span>Primary link</span>
+          <div class="quick-link-row">
+            <input type="url" name="primaryLink" value="<%= file ? file.primaryLink : '' %>" placeholder="https://..." required />
+            <button class="btn btn-secondary auto-fill-button" type="button" data-auto-fill>Auto Fill</button>
+          </div>
+          <div class="field-help">Paste the real link here. Brand, category, price, tags, password, and file size will be suggested automatically.</div>
+          <div class="auto-fill-status muted" data-auto-status></div>
+        </div>
+
+        <div class="field">
+          <span>Brand</span>
+          <input type="text" name="brand" value="<%= file ? file.brand : '' %>" placeholder="Huawei / Honor" />
+        </div>
+
+        <div class="field">
+          <span>Version</span>
+          <input type="text" name="version" value="<%= file ? file.version : '' %>" placeholder="HarmonyOS / EMUI / Build number" />
+        </div>
+
+        <div class="field">
+          <span>Price</span>
+          <input type="text" name="price" value="<%= file ? (file.price || '$10') : '$10' %>" placeholder="$10" />
+        </div>
+
+        <div class="field">
+          <span>Category</span>
+          <select name="categorySlug">
+            <% categories.forEach((category) => { %>
+              <option value="<%= category.slug %>" <%= file && file.categorySlug === category.slug ? "selected" : "" %>><%= category.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="field">
+          <span>File size</span>
+          <input type="text" name="fileSize" value="<%= file ? file.fileSize : '' %>" placeholder="Auto from link if available" />
+        </div>
+
+        <div class="field">
+          <span>File password</span>
+          <input type="text" name="password" value="<%= file ? file.password : '' %>" placeholder="Auto: aosunlock.my.id" />
+        </div>
+
+        <div class="field">
+          <span>Download count</span>
+          <input type="number" name="downloadCount" min="0" value="<%= file ? file.downloadCount : 0 %>" />
+        </div>
+
+        <div class="field full">
+          <span>Description</span>
+          <textarea name="description" placeholder="Auto description will appear here if this field is empty."><%= file ? file.description : '' %></textarea>
+        </div>
+
+        <details class="admin-advanced field full" <%= file ? "open" : "" %>>
+          <summary>Advanced fields</summary>
+          <div class="admin-advanced-grid">
+            <div class="field full">
+              <span>Mirror link</span>
+              <input type="url" name="mirrorLink" value="<%= file ? file.mirrorLink : '' %>" placeholder="https://..." />
+            </div>
+
+            <div class="field full">
+              <span>Tags</span>
+              <input type="text" name="tags" value="<%= file ? file.tags.join(', ') : '' %>" placeholder="huawei, honor, kirin, firmware" />
+            </div>
+
+            <div class="field full">
+              <div class="check-row">
+                <label><input type="checkbox" name="featured" <%= file && file.featured ? "checked" : "" %> /> Featured</label>
+                <label><input type="checkbox" name="hot" <%= file && file.hot ? "checked" : "" %> /> Hot</label>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <div class="field full">
+          <button class="btn btn-primary" type="submit">Save File</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const form = document.querySelector("[data-auto-form]");
+    if (!form) return;
+
+    const autoButton = form.querySelector("[data-auto-fill]");
+    const status = form.querySelector("[data-auto-status]");
+    const titleInput = form.querySelector('[name="title"]');
+    const linkInput = form.querySelector('[name="primaryLink"]');
+    const categoryInput = form.querySelector('[name="categorySlug"]');
+
+    const applyValue = (name, value, overwrite = true) => {
+      const field = form.querySelector(`[name="${name}"]`);
+      if (!field || value === undefined || value === null || value === "") return;
+
+      if (!overwrite && field.value.trim()) return;
+
+      field.value = Array.isArray(value) ? value.join(", ") : value;
+    };
+
+    const runAutoFill = async (overwrite = true) => {
+      if (!linkInput.value.trim()) {
+        status.textContent = "Paste the primary link first.";
+        return;
+      }
+
+      autoButton.disabled = true;
+      status.textContent = "Checking link and preparing fields...";
+
+      try {
+        const response = await fetch("/admin/link-preview", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            title: titleInput.value,
+            primaryLink: linkInput.value,
+            categorySlug: categoryInput.value
+          })
+        });
+
+        const payload = await response.json();
+
+        if (!response.ok || !payload.ok) {
+          throw new Error(payload.message || "Auto fill failed.");
+        }
+
+        applyValue("title", payload.data.title, false);
+        applyValue("brand", payload.data.brand, overwrite);
+        applyValue("version", payload.data.version, overwrite);
+        applyValue("price", payload.data.price, overwrite);
+        applyValue("categorySlug", payload.data.categorySlug, overwrite);
+        applyValue("fileSize", payload.data.fileSize, overwrite);
+        applyValue("description", payload.data.description, overwrite);
+        applyValue("password", payload.data.password, overwrite);
+        applyValue("tags", payload.data.tags, overwrite);
+
+        if (!form.querySelector('[name="downloadCount"]').value.trim()) {
+          applyValue("downloadCount", payload.data.downloadCount, overwrite);
+        }
+
+        status.textContent = payload.message || "Auto fill complete.";
+      } catch (error) {
+        status.textContent = error.message || "Could not auto fill this link.";
+      } finally {
+        autoButton.disabled = false;
+      }
+    };
+
+    autoButton.addEventListener("click", () => runAutoFill(true));
+    linkInput.addEventListener("blur", () => {
+      if (linkInput.value.trim()) {
+        runAutoFill(false);
+      }
+    });
+  })();
+</script>
+
+<%- include("footer") %>

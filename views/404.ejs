@@ -1,0 +1,16 @@
+<%- include("partials/header", { title: "404", site, currentPath, flash, siteCategories }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="hero-card">
+      <div class="eyebrow">404</div>
+      <h1>Page not found.</h1>
+      <p>The link may have changed or the file is no longer available.</p>
+      <div class="action-row spacer-top">
+        <a class="btn btn-primary" href="/">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include("partials/footer", { site }) %>

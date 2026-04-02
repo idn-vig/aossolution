@@ -1,0 +1,77 @@
+{
+  "site": {
+    "name": "AOS-SOLUTION",
+    "tagline": "Huawei and Honor file solution archive with firmware, FRP, test point, and repair tools.",
+    "notice": "Huawei and Honor file solutions, verified firmware links, and service tool access.",
+    "logo": "/huawei-solutions.svg",
+    "telegram": "https://t.me/websolutionhub",
+    "whatsapp": "https://wa.me/6282234370999",
+    "contactNumber": "+6282234370999",
+    "facebook": "https://www.facebook.com/anggaaosunlocker",
+    "website": "https://aosunlock.my.id"
+  },
+  "admin": {
+    "username": "admin",
+    "passwordHash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"
+  },
+  "categories": [
+    {
+      "slug": "qualcomm",
+      "name": "Qualcomm",
+      "icon": "chip",
+      "description": "Qualcomm firmware, test point files, XML packages, and flash resources for Huawei and Honor devices."
+    },
+    {
+      "slug": "kirin",
+      "name": "Kirin",
+      "icon": "cpu",
+      "description": "Kirin firmware dumps, board software, and unbrick resources for Huawei and Honor models."
+    },
+    {
+      "slug": "spd",
+      "name": "SPD",
+      "icon": "flash",
+      "description": "SPD service packages, drivers, and supported repair resources for compatible devices."
+    },
+    {
+      "slug": "tools",
+      "name": "Tools",
+      "icon": "tool",
+      "description": "Flash tools, unlock utilities, drivers, and helper software for Huawei and Honor servicing."
+    },
+    {
+      "slug": "remote-contact",
+      "name": "Remote Contact",
+      "icon": "support",
+      "description": "Remote service access, contact channels, and support resources."
+    }
+  ],
+  "files": [
+    {
+      "id": "1775117976060",
+      "title": "Honor 400pro-DNP-AN00 9.0.0.125",
+      "slug": "honor-400pro-dnp-an00-9-0-0-125",
+      "brand": "Honor",
+      "version": "9.0.0.125",
+      "price": "$10",
+      "categorySlug": "qualcomm",
+      "categoryName": "Qualcomm",
+      "description": "Honor 400pro-DNP-AN00 9.0.0.125 package for Honor devices. Includes the main qualcomm resources for service and repair use.",
+      "password": "aosunlock.my.id",
+      "primaryLink": "https://drive.google.com/drive/folders/1EP8Wq3GfCk4CGxOaIVXdkvhQnPtSmkxi?usp=sharing",
+      "mirrorLink": "",
+      "tags": [
+        "honor",
+        "qualcomm",
+        "huawei",
+        "400pro-dnp-an00",
+        "125"
+      ],
+      "fileSize": "",
+      "featured": false,
+      "hot": true,
+      "downloadCount": 0,
+      "updatedAt": "2026-04-02T08:19:36.060Z"
+    }
+  ]
+}

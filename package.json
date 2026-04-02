@@ -1,0 +1,15 @@
+{
+  "name": "web-solution-download",
+  "version": "1.0.0",
+  "description": "Lightweight dark-theme download portal with admin dashboard",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --no-warnings app.js",
+    "dev": "node --no-warnings --watch app.js"
+  },
+  "dependencies": {
+    "ejs": "^5.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0"
+  }
+}

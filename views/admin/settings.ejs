@@ -1,0 +1,64 @@
+<%- include("header", { title: "Settings", site, currentPath, flash, adminUser }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="admin-head">
+      <h1>Website Settings</h1>
+      <p class="muted">Update the site name, admin contact, notice text, logo, and your dashboard login.</p>
+    </div>
+
+    <div class="panel">
+      <form action="/admin/settings" method="post" class="settings-grid">
+        <div class="field">
+          <span>Website name</span>
+          <input type="text" name="siteName" value="<%= site.name %>" />
+        </div>
+        <div class="field">
+          <span>Tagline</span>
+          <input type="text" name="tagline" value="<%= site.tagline %>" />
+        </div>
+        <div class="field full">
+          <span>Notice topbar</span>
+          <input type="text" name="notice" value="<%= site.notice %>" />
+        </div>
+        <div class="field full">
+          <span>Logo path</span>
+          <input type="text" name="logo" value="<%= site.logo || '' %>" placeholder="/huawei-solutions.svg" />
+        </div>
+        <div class="field">
+          <span>Telegram URL</span>
+          <input type="url" name="telegram" value="<%= site.telegram %>" />
+        </div>
+        <div class="field">
+          <span>WhatsApp URL</span>
+          <input type="url" name="whatsapp" value="<%= site.whatsapp %>" />
+        </div>
+        <div class="field">
+          <span>Contact number</span>
+          <input type="text" name="contactNumber" value="<%= site.contactNumber || '' %>" placeholder="+6282234370999" />
+        </div>
+        <div class="field">
+          <span>Facebook URL</span>
+          <input type="url" name="facebook" value="<%= site.facebook || '' %>" placeholder="https://www.facebook.com/anggaaosunlocker" />
+        </div>
+        <div class="field">
+          <span>Main website</span>
+          <input type="url" name="website" value="<%= site.website || '' %>" placeholder="https://aosunlock.my.id" />
+        </div>
+        <div class="field">
+          <span>Admin username</span>
+          <input type="text" name="username" value="<%= admin.username %>" />
+        </div>
+        <div class="field">
+          <span>New admin password</span>
+          <input type="password" name="newPassword" placeholder="Leave blank if you do not want to change it" />
+        </div>
+        <div class="field full">
+          <button class="btn btn-primary" type="submit">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include("footer") %>
