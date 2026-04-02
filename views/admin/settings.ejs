@@ -8,7 +8,7 @@
     </div>
 
     <div class="panel">
-      <form action="/admin/settings" method="post" class="settings-grid">
+      <form action="<%= adminSettings %>" method="post" class="settings-grid">
         <div class="field">
           <span>Website name</span>
           <input type="text" name="siteName" value="<%= site.name %>" />

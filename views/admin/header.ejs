@@ -10,18 +10,18 @@
 <body>
   <div class="navbar-wrap">
     <div class="container navbar">
-      <a href="/admin" class="brand">
+      <a href="<%= adminDashboard %>" class="brand">
         <div class="brand-title">Admin <span>Dashboard</span></div>
         <div class="brand-copy"><%= site.name %></div>
       </a>
       <nav class="admin-links">
         <% if (adminUser) { %>
-          <a class="<%= currentPath === '/admin' ? 'active' : '' %>" href="/admin">Dashboard</a>
-          <a class="<%= currentPath === '/admin/files/new' ? 'active' : '' %>" href="/admin/files/new">Add File</a>
-          <a class="<%= currentPath === '/admin/settings' ? 'active' : '' %>" href="/admin/settings">Settings</a>
-          <a href="/admin/logout">Logout</a>
+          <a class="<%= currentPath === adminDashboard ? 'active' : '' %>" href="<%= adminDashboard %>">Dashboard</a>
+          <a class="<%= currentPath === adminNewFile ? 'active' : '' %>" href="<%= adminNewFile %>">Add File</a>
+          <a class="<%= currentPath === adminSettings ? 'active' : '' %>" href="<%= adminSettings %>">Settings</a>
+          <a href="<%= adminLogout %>">Logout</a>
         <% } else { %>
-          <a class="<%= currentPath === '/admin/login' ? 'active' : '' %>" href="/admin/login">Login</a>
+          <a class="<%= currentPath === adminBase ? 'active' : '' %>" href="<%= adminBase %>">Login</a>
         <% } %>
       </nav>
       <div class="inline-actions">

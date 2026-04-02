@@ -129,7 +129,7 @@
       status.textContent = "Checking link and preparing fields...";
 
       try {
-        const response = await fetch("/admin/link-preview", {
+        const response = await fetch("<%= adminLinkPreview %>", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

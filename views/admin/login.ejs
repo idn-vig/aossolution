@@ -6,7 +6,7 @@
       <div class="eyebrow">Admin Only</div>
       <h1>Sign in to manage real download files.</h1>
       <p class="muted">Public visitors do not need a login. This panel is only for you to manage titles, prices, passwords, and real links.</p>
-      <form action="/admin/login" method="post" class="form-grid spacer-top">
+      <form action="<%= adminBase %>" method="post" class="form-grid spacer-top">
         <div class="field full">
           <span>Username</span>
           <input type="text" name="username" placeholder="Enter your admin username" required />

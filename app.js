@@ -8,6 +8,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DEFAULT_PRICE = "$10";
 const METADATA_TIMEOUT_MS = 8000;
+const ADMIN_BASE = "/aos-panel-login-2026";
+const ADMIN_DASHBOARD = `${ADMIN_BASE}/dashboard`;
+const ADMIN_NEW_FILE = `${ADMIN_BASE}/files/new`;
+const ADMIN_FILES = `${ADMIN_BASE}/files`;
+const ADMIN_SETTINGS = `${ADMIN_BASE}/settings`;
+const ADMIN_LOGOUT = `${ADMIN_BASE}/logout`;
+const ADMIN_LINK_PREVIEW = `${ADMIN_BASE}/link-preview`;
 
 function slugify(value) {
   return String(value || "")
@@ -330,7 +337,7 @@ async function buildAutoDraft({ title, primaryLink, store, categorySlug }) {
 function requireAdmin(req, res, next) {
   if (!req.session.adminUser) {
     req.session.flash = { type: "error", message: "Please sign in to access the admin dashboard." };
-    return res.redirect("/admin/login");
+    return res.redirect(ADMIN_BASE);
   }
   next();
 }
@@ -358,15 +365,22 @@ app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   res.locals.adminUser = req.session.adminUser;
   res.locals.siteCategories = store.categories;
+  res.locals.adminBase = ADMIN_BASE;
+  res.locals.adminDashboard = ADMIN_DASHBOARD;
+  res.locals.adminNewFile = ADMIN_NEW_FILE;
+  res.locals.adminFiles = ADMIN_FILES;
+  res.locals.adminSettings = ADMIN_SETTINGS;
+  res.locals.adminLogout = ADMIN_LOGOUT;
+  res.locals.adminLinkPreview = ADMIN_LINK_PREVIEW;
   next();
 });
 
 app.get("/robots.txt", (req, res) => {
   res.type("text/plain");
-  res.send("User-agent: *\nDisallow: /admin\n");
+  res.send(`User-agent: *\nDisallow: ${ADMIN_BASE}\nDisallow: /admin\n`);
 });
 
-app.use("/admin", (req, res, next) => {
+app.use(ADMIN_BASE, (req, res, next) => {
   res.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   next();
 });
@@ -444,16 +458,16 @@ app.get("/file/:slug", (req, res) => {
   });
 });
 
-app.get("/admin/login", (req, res) => {
+app.get(ADMIN_BASE, (req, res) => {
     if (req.session.adminUser) {
-      return res.redirect("/admin");
+      return res.redirect(ADMIN_DASHBOARD);
     }
 
   const store = readStore();
   res.render("admin/login", { site: store.site });
 });
 
-app.post("/admin/login", (req, res) => {
+app.post(ADMIN_BASE, (req, res) => {
   const store = readStore();
   const { username, password } = req.body;
 
@@ -463,20 +477,20 @@ app.post("/admin/login", (req, res) => {
     ) {
       req.session.adminUser = username;
       req.session.flash = { type: "success", message: "Admin login successful." };
-      return res.redirect("/admin");
+      return res.redirect(ADMIN_DASHBOARD);
     }
 
     req.session.flash = { type: "error", message: "Invalid username or password." };
-    res.redirect("/admin/login");
+    res.redirect(ADMIN_BASE);
   });
 
-app.get("/admin/logout", (req, res) => {
+app.get(ADMIN_LOGOUT, (req, res) => {
   req.session.destroy(() => {
-    res.redirect("/admin/login");
+    res.redirect(ADMIN_BASE);
   });
 });
 
-app.get("/admin", requireAdmin, (req, res) => {
+app.get(ADMIN_DASHBOARD, requireAdmin, (req, res) => {
   const store = readStore();
   const files = [...store.files].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
@@ -493,19 +507,19 @@ app.get("/admin", requireAdmin, (req, res) => {
   });
 });
 
-app.get("/admin/files/new", requireAdmin, (req, res) => {
+app.get(ADMIN_NEW_FILE, requireAdmin, (req, res) => {
   const store = readStore();
 
   res.render("admin/form", {
     site: store.site,
     categories: store.categories,
     file: null,
-    formAction: "/admin/files",
+    formAction: ADMIN_FILES,
     pageTitle: "Add New File",
   });
 });
 
-app.post("/admin/link-preview", requireAdmin, async (req, res) => {
+app.post(ADMIN_LINK_PREVIEW, requireAdmin, async (req, res) => {
   try {
     const store = readStore();
     const title = (req.body.title || "").trim();
@@ -537,14 +551,14 @@ app.post("/admin/link-preview", requireAdmin, async (req, res) => {
   }
 });
 
-app.post("/admin/files", requireAdmin, async (req, res) => {
+app.post(ADMIN_FILES, requireAdmin, async (req, res) => {
   const store = readStore();
   const title = (req.body.title || "").trim();
   const primaryLink = (req.body.primaryLink || "").trim();
 
   if (!title || !primaryLink) {
     req.session.flash = { type: "error", message: "Title and primary link are required." };
-    return res.redirect("/admin/files/new");
+    return res.redirect(ADMIN_NEW_FILE);
   }
 
   const autoDraft = await buildAutoDraft({
@@ -558,7 +572,7 @@ app.post("/admin/files", requireAdmin, async (req, res) => {
 
   if (!category) {
     req.session.flash = { type: "error", message: "Please choose the correct category before saving." };
-    return res.redirect("/admin/files/new");
+    return res.redirect(ADMIN_NEW_FILE);
   }
 
   const file = {
@@ -586,28 +600,28 @@ app.post("/admin/files", requireAdmin, async (req, res) => {
   writeStore(store);
 
   req.session.flash = { type: "success", message: "New file added successfully." };
-  res.redirect("/admin");
+  res.redirect(ADMIN_DASHBOARD);
 });
 
-app.get("/admin/files/:id/edit", requireAdmin, (req, res) => {
+app.get(`${ADMIN_FILES}/:id/edit`, requireAdmin, (req, res) => {
   const store = readStore();
   const file = store.files.find((item) => item.id === req.params.id);
 
   if (!file) {
     req.session.flash = { type: "error", message: "File data was not found." };
-    return res.redirect("/admin");
+    return res.redirect(ADMIN_DASHBOARD);
   }
 
   res.render("admin/form", {
     site: store.site,
     categories: store.categories,
     file,
-    formAction: `/admin/files/${file.id}/update`,
+    formAction: `${ADMIN_FILES}/${file.id}/update`,
     pageTitle: `Edit ${file.title}`,
   });
 });
 
-app.post("/admin/files/:id/update", requireAdmin, async (req, res) => {
+app.post(`${ADMIN_FILES}/:id/update`, requireAdmin, async (req, res) => {
   const store = readStore();
   const file = store.files.find((item) => item.id === req.params.id);
   const title = (req.body.title || "").trim();
@@ -615,7 +629,7 @@ app.post("/admin/files/:id/update", requireAdmin, async (req, res) => {
 
   if (!file || !title || !primaryLink) {
     req.session.flash = { type: "error", message: "File, title, and primary link must be valid." };
-    return res.redirect("/admin");
+    return res.redirect(ADMIN_DASHBOARD);
   }
 
   const autoDraft = await buildAutoDraft({
@@ -629,7 +643,7 @@ app.post("/admin/files/:id/update", requireAdmin, async (req, res) => {
 
   if (!category) {
     req.session.flash = { type: "error", message: "Please choose the correct category before saving." };
-    return res.redirect("/admin");
+    return res.redirect(ADMIN_DASHBOARD);
   }
 
   file.title = title;
@@ -653,30 +667,30 @@ app.post("/admin/files/:id/update", requireAdmin, async (req, res) => {
   writeStore(store);
 
   req.session.flash = { type: "success", message: "File updated successfully." };
-  res.redirect("/admin");
+  res.redirect(ADMIN_DASHBOARD);
 });
 
-app.post("/admin/files/:id/delete", requireAdmin, (req, res) => {
+app.post(`${ADMIN_FILES}/:id/delete`, requireAdmin, (req, res) => {
   const store = readStore();
   const initialLength = store.files.length;
   store.files = store.files.filter((item) => item.id !== req.params.id);
 
   if (store.files.length === initialLength) {
     req.session.flash = { type: "error", message: "File was not found." };
-    return res.redirect("/admin");
+    return res.redirect(ADMIN_DASHBOARD);
   }
 
   writeStore(store);
   req.session.flash = { type: "success", message: "File deleted successfully." };
-  res.redirect("/admin");
+  res.redirect(ADMIN_DASHBOARD);
 });
 
-app.get("/admin/settings", requireAdmin, (req, res) => {
+app.get(ADMIN_SETTINGS, requireAdmin, (req, res) => {
   const store = readStore();
   res.render("admin/settings", { site: store.site, admin: store.admin });
 });
 
-app.post("/admin/settings", requireAdmin, (req, res) => {
+app.post(ADMIN_SETTINGS, requireAdmin, (req, res) => {
   const store = readStore();
 
   store.site.name = (req.body.siteName || "").trim();
@@ -697,7 +711,11 @@ app.post("/admin/settings", requireAdmin, (req, res) => {
 
   writeStore(store);
   req.session.flash = { type: "success", message: "Website settings saved successfully." };
-  res.redirect("/admin/settings");
+  res.redirect(ADMIN_SETTINGS);
+});
+
+app.use("/admin", (req, res) => {
+  res.redirect("/");
 });
 
 app.use((req, res) => {
