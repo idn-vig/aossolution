@@ -42,6 +42,7 @@
         <div class="field">
           <span>Category</span>
           <select name="categorySlug">
+            <option value="">Select category</option>
             <% categories.forEach((category) => { %>
               <option value="<%= category.slug %>" <%= file && file.categorySlug === category.slug ? "selected" : "" %>><%= category.name %></option>
             <% }) %>

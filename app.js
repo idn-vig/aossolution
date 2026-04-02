@@ -113,7 +113,7 @@ function guessCategorySlug(value, categories, currentSlug) {
     return currentSlug;
   }
 
-  return categories[0]?.slug || "";
+  return "";
 }
 
 function extractVersion(value) {
@@ -136,7 +136,7 @@ function extractVersion(value) {
 
 function buildTags({ title, brand, categoryName }) {
   const tagSet = new Set();
-  const combined = `${title} ${brand} ${categoryName}`
+  const combined = `${title || ""} ${brand || ""} ${categoryName || ""}`
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, " ")
     .split(/\s+/)
@@ -201,6 +201,16 @@ async function fetchLinkMetadata(rawUrl) {
       fileSize: "",
       fileName: "",
       warnings: ["Google Drive folder link detected. Size cannot be read automatically. Use a direct file link or fill the size manually."],
+    };
+  }
+
+  if (host.includes("drive.google.com") && pathname.includes("/file/d/")) {
+    return {
+      fileSize: "",
+      fileName: "",
+      warnings: [
+        "Google Drive view link detected. The page size is not the real file size. Please fill the size manually or use a direct download link.",
+      ],
     };
   }
 
@@ -288,12 +298,18 @@ async function buildAutoDraft({ title, primaryLink, store, categorySlug }) {
   const combinedSource = [title, metadata.fileName, primaryLink].filter(Boolean).join(" ");
   const brand = guessBrand(combinedSource);
   const resolvedCategorySlug = guessCategorySlug(combinedSource, store.categories, categorySlug);
-  const category = store.categories.find((item) => item.slug === resolvedCategorySlug) || store.categories[0];
+  const category = store.categories.find((item) => item.slug === resolvedCategorySlug);
   const version = extractVersion(combinedSource);
   const fileSize = metadata.fileSize || extractSizeFromText(combinedSource);
   const resolvedTitle =
     String(title || "").trim() ||
     metadata.fileName.replace(/\.[a-z0-9]{1,5}$/i, "").replace(/[_-]+/g, " ").trim();
+
+  const warnings = [...metadata.warnings];
+
+  if (!resolvedCategorySlug) {
+    warnings.push("Category could not be guessed automatically from this title/link. Please choose it manually.");
+  }
 
   return {
     title: resolvedTitle,
@@ -302,12 +318,12 @@ async function buildAutoDraft({ title, primaryLink, store, categorySlug }) {
     price: DEFAULT_PRICE,
     categorySlug: category?.slug || "",
     categoryName: category?.name || "",
-    description: buildDescription({ title: resolvedTitle || "Huawei / Honor file", brand, categoryName: category?.name }),
+    description: buildDescription({ title: resolvedTitle || "Huawei / Honor file", brand, categoryName: category?.name || "file solution" }),
     password: getDefaultPassword(store.site),
     fileSize,
     tags: buildTags({ title: resolvedTitle, brand, categoryName: category?.name }),
     downloadCount: 0,
-    warnings: metadata.warnings,
+    warnings,
   };
 }
 
@@ -527,9 +543,13 @@ app.post("/admin/files", requireAdmin, async (req, res) => {
     store,
     categorySlug: (req.body.categorySlug || "").trim(),
   });
-  const category =
-    store.categories.find((item) => item.slug === ((req.body.categorySlug || "").trim() || autoDraft.categorySlug)) ||
-    store.categories[0];
+  const resolvedCategorySlug = ((req.body.categorySlug || "").trim() || autoDraft.categorySlug);
+  const category = store.categories.find((item) => item.slug === resolvedCategorySlug);
+
+  if (!category) {
+    req.session.flash = { type: "error", message: "Please choose the correct category before saving." };
+    return res.redirect("/admin/files/new");
+  }
 
   const file = {
     id: String(Date.now()),
@@ -594,9 +614,13 @@ app.post("/admin/files/:id/update", requireAdmin, async (req, res) => {
     store,
     categorySlug: (req.body.categorySlug || "").trim() || file.categorySlug,
   });
-  const category =
-    store.categories.find((item) => item.slug === ((req.body.categorySlug || "").trim() || autoDraft.categorySlug || file.categorySlug)) ||
-    store.categories[0];
+  const resolvedCategorySlug = ((req.body.categorySlug || "").trim() || autoDraft.categorySlug || file.categorySlug);
+  const category = store.categories.find((item) => item.slug === resolvedCategorySlug);
+
+  if (!category) {
+    req.session.flash = { type: "error", message: "Please choose the correct category before saving." };
+    return res.redirect("/admin");
+  }
 
   file.title = title;
   file.slug = ensureUniqueSlug(slugify(title), store.files, file.id);
