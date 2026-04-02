@@ -5,6 +5,38 @@ const { DatabaseSync } = require("node:sqlite");
 const DATA_DIR = path.join(__dirname, "data");
 const DB_FILE = path.join(DATA_DIR, "aos.sqlite");
 const LEGACY_JSON_FILE = path.join(DATA_DIR, "site.json");
+const DEFAULT_CATEGORIES = [
+  {
+    slug: "qualcomm",
+    name: "Qualcomm",
+    icon: "chip",
+    description: "Qualcomm firmware, test point files, XML packages, and flash resources for Huawei and Honor devices.",
+  },
+  {
+    slug: "kirin",
+    name: "Kirin",
+    icon: "cpu",
+    description: "Kirin firmware dumps, board software, and unbrick resources for Huawei and Honor models.",
+  },
+  {
+    slug: "spd",
+    name: "SPD",
+    icon: "flash",
+    description: "SPD service packages, drivers, and supported repair resources for compatible devices.",
+  },
+  {
+    slug: "tools",
+    name: "Tools",
+    icon: "tool",
+    description: "Flash tools, unlock utilities, drivers, and helper software for Huawei and Honor servicing.",
+  },
+  {
+    slug: "remote-contact",
+    name: "Remote Contact",
+    icon: "support",
+    description: "Remote service access, contact channels, and support resources.",
+  },
+];
 
 function ensureDataDir() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -27,7 +59,7 @@ function defaultStore() {
       username: "admin",
       passwordHash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
     },
-    categories: [],
+    categories: DEFAULT_CATEGORIES,
     files: [],
   };
 }
@@ -231,8 +263,41 @@ function seedDatabaseIfEmpty() {
   writeStore(initialStore);
 }
 
+function ensureSeedData() {
+  const defaults = defaultStore();
+  const settingsCount = db.prepare("SELECT COUNT(*) AS total FROM site_settings").get().total;
+  const adminCount = db.prepare("SELECT COUNT(*) AS total FROM admin").get().total;
+  const categoryCount = db.prepare("SELECT COUNT(*) AS total FROM categories").get().total;
+
+  runInTransaction(() => {
+    if (settingsCount === 0) {
+      const siteInsert = db.prepare("INSERT INTO site_settings (key, value) VALUES (?, ?)");
+      Object.entries(defaults.site).forEach(([key, value]) => {
+        siteInsert.run(key, String(value ?? ""));
+      });
+    }
+
+    if (adminCount === 0) {
+      db
+        .prepare("INSERT INTO admin (id, username, passwordHash) VALUES (1, ?, ?)")
+        .run(defaults.admin.username, defaults.admin.passwordHash);
+    }
+
+    if (categoryCount === 0) {
+      const categoryInsert = db.prepare(
+        "INSERT INTO categories (slug, name, icon, description, sortOrder) VALUES (?, ?, ?, ?, ?)"
+      );
+
+      defaults.categories.forEach((category, index) => {
+        categoryInsert.run(category.slug, category.name, category.icon, category.description, index);
+      });
+    }
+  });
+}
+
 initializeSchema();
 seedDatabaseIfEmpty();
+ensureSeedData();
 
 function readStore() {
   return hydrateStoreFromDatabase();
